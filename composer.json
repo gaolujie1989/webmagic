@@ -1,0 +1,14 @@
+{
+    "name": "gaolujie1989/webmagic",
+    "description": "A scalable web crawler framework for php.",
+    "keywords": ["Spider", "Crawler"],
+    "type": "library",
+    "require": {
+        "php": ">=5.4.0",
+        "guzzlehttp/guzzle": "~6.2.3",
+        "catfan/Medoo": "~1.4"
+    },
+    "autoload": {
+        "psr-4": {"webmagic\\": ""}
+    }
+}
