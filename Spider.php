@@ -33,15 +33,6 @@ class Spider
 
     public $concurrency = 1;
 
-    public function __construct()
-    {
-        $this->failCallback = function ($reason, $index, $url, $extra) {
-            /** @var RequestException $reason */
-            $this->scheduler->push($url);
-            $this->log('Push to scheduler, Url: ' . $url);
-        };
-    }
-
     public function run()
     {
         $client = new Client(['verify' => false]);
