@@ -57,7 +57,7 @@ class Spider
             'rejected' => function ($reason, $index) {
                 /** @var RequestException $reason */
                 $url = $this->scheduler->getUrl($index);
-                $extra = $this->scheduler->getExtra($index);
+                $extra = $this->scheduler->getExtra($url);
 
                 $this->log('Download Failed, Url: ' . $url . ', Reason: ' . $reason->getMessage());
                 $this->retry($reason, $index, $url, $extra);
