@@ -30,8 +30,8 @@ interface Scheduler
     public function getUrl($index);
 
     /**
-     * @param $index
+     * @param $url
      * @return bool|array
      */
-    public function getExtra($index);
+    public function getExtra($url);
 }

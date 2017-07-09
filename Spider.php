@@ -40,7 +40,7 @@ class Spider
             'concurrency' => $this->concurrency,
             'fulfilled' => function ($response, $index) {
                 $url = $this->scheduler->getUrl($index);
-                $extra = $this->scheduler->getExtra($index);
+                $extra = $this->scheduler->getExtra($url);
 
                 $this->log('Download Success, Url: ' . $url
                     . ', Queue Left: ' . $this->scheduler->getLeftUrlsCount()
