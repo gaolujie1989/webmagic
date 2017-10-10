@@ -5,9 +5,6 @@
 
 namespace webmagic\scheduler;
 
-
-use GuzzleHttp\Psr7\Request;
-
 /**
  * Class ArrayScheduler
  * @package lib\webmagic\scheduler
@@ -15,8 +12,6 @@ use GuzzleHttp\Psr7\Request;
  */
 class ArrayScheduler implements Scheduler, MonitorableScheduler
 {
-    public $currentIndex = 0;
-
     /**
      * @var array, the url list
      */
@@ -67,9 +62,7 @@ class ArrayScheduler implements Scheduler, MonitorableScheduler
         if ($extra) {
             $this->extras[$url] = $extra;
         }
-        $this->queue[$this->currentIndex] = $url;
-        $this->queueIndex[$this->currentIndex] = $url;
-        $this->currentIndex++;
+        $this->queue[] = $url;
     }
 
     /**
@@ -78,11 +71,9 @@ class ArrayScheduler implements Scheduler, MonitorableScheduler
      */
     public function poll()
     {
-        $this->queueIndex = array_values($this->queue);
-        $this->queue = array_values($this->queue);
-
         while ($this->queue) {
             $url = array_shift($this->queue);
+            $this->queueIndex[] = $url;
             $extra = $this->getExtra($url);
             yield ['url' => $url, 'extra' => $extra];
         }
@@ -106,6 +97,6 @@ class ArrayScheduler implements Scheduler, MonitorableScheduler
      */
     public function getTotalUrlsCount()
     {
-        return count($this->queueIndex);
+        return count($this->queueIndex) + count($this->queue);
     }
 }

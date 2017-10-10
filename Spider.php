@@ -9,6 +9,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Response;
+use Psr\Log\LoggerInterface;
 use webmagic\pipeline\Pipeline;
 use webmagic\scheduler\MonitorableScheduler;
 use webmagic\scheduler\Scheduler;
@@ -32,6 +33,9 @@ class Spider
     public $startUrls = [];
 
     public $concurrency = 1;
+
+    /** @var LoggerInterface */
+    public $logger;
 
     public function run()
     {
@@ -81,6 +85,10 @@ class Spider
 
     public function log($msg)
     {
-        echo date('Y-m-d H:i:s') . ' ' . $msg, "\n";
+        if ($this->logger) {
+            $this->logger->info($msg);
+        } else {
+            echo date('Y-m-d H:i:s') . ' ' . $msg, "\n";
+        }
     }
 }

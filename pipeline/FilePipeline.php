@@ -7,7 +7,6 @@ namespace webmagic\pipeline;
 
 
 use GuzzleHttp\Psr7\Response;
-use Yii;
 
 /**
  * Class HtmlDbPipeline
