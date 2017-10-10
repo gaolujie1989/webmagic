@@ -6,8 +6,6 @@
 namespace webmagic\scheduler;
 
 
-use GuzzleHttp\Psr7\Request;
-
 /**
  * Class ArrayScheduler
  * @package lib\webmagic\scheduler
@@ -80,6 +78,13 @@ class ArrayScheduler implements Scheduler, MonitorableScheduler
             $extra = $this->getExtra($url);
             yield ['url' => $url, 'extra' => $extra];
         }
+    }
+
+    public function reset()
+    {
+        $this->queue = [];
+        $this->extras = [];
+        $this->queueIndex = [];
     }
 
     public function __invoke()
