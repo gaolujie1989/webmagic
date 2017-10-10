@@ -8,6 +8,7 @@ namespace webmagic;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Pool;
+use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Psr\Log\LoggerInterface;
 use webmagic\pipeline\Pipeline;
@@ -37,10 +38,18 @@ class Spider
     /** @var LoggerInterface */
     public $logger;
 
+    public $clientOptions = [
+        'verify' => false,
+    ];
+
+    public $requestOptions = [
+        'cookie' => false,
+    ];
+
     public function run()
     {
-        $client = new Client(['verify' => false]);
-        $pool = new Pool($client, $this->scheduler->poll(), [
+        $client = new Client($this->clientOptions);
+        $pool = new Pool($client, $this->pollRequest(), [
             'concurrency' => $this->concurrency,
             'fulfilled' => function ($response, $index) {
                 $url = $this->scheduler->getUrl($index);
@@ -70,6 +79,13 @@ class Spider
 
         $promise = $pool->promise();
         $promise->wait();
+    }
+
+    public function pollRequest()
+    {
+        foreach ($this->scheduler->poll() as $item) {
+            yield new Request('GET', $item['url'], $this->requestOptions);
+        }
     }
 
     /**

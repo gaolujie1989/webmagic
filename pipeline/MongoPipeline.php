@@ -30,6 +30,7 @@ class MongoPipeline implements Pipeline
 
     public $databaseName = 'spider';
     public $collectionName = 'spider_data';
+    public $index = 'url';
 
     /**
      * @var \Closure
@@ -53,7 +54,6 @@ class MongoPipeline implements Pipeline
      * @param string $index
      * @param string $url
      * @param array $extra
-     * @return int
      * @inheritdoc
      */
     public function process($response, $index, $url, $extra)
@@ -62,11 +62,19 @@ class MongoPipeline implements Pipeline
         if ($this->extractCallback && is_callable($this->extractCallback)) {
             $data = call_user_func($this->extractCallback, $html, $url, $extra);
         } else {
-//            $html = base64_encode(gzdeflate($html));
             $data = array_merge($extra, ['url' => $url, 'html' => $html]);
         }
 
-        return $this->getCollection()->insertOne($data);
+        if ($this->index && isset($data[$this->index])) {
+            $condition = [$this->index => $data[$this->index]];
+            $one = $this->getCollection()->findOne($condition);
+            if ($one) {
+                $this->getCollection()->updateOne($condition, ['$set' => $data]);
+                return;
+            }
+        }
+
+        $this->getCollection()->insertOne($data);
     }
 
     /**

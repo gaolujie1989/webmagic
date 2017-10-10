@@ -5,6 +5,9 @@
 
 namespace webmagic\scheduler;
 
+
+use GuzzleHttp\Psr7\Request;
+
 /**
  * Class ArrayScheduler
  * @package lib\webmagic\scheduler

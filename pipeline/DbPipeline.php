@@ -60,7 +60,6 @@ class DbPipeline implements Pipeline
         if ($this->extractCallback && is_callable($this->extractCallback)) {
             $data = call_user_func($this->extractCallback, $html, $url, $extra);
         } else {
-//            $html = base64_encode(gzdeflate($html));
             $data = array_merge($extra, ['url' => $url, 'html' => $html]);
         }
         return $this->getDb()->insert($this->table, $data);

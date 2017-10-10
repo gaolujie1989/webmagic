@@ -6,6 +6,7 @@
 namespace lib\webmagic\scheduler;
 
 
+use GuzzleHttp\Psr7\Request;
 use webmagic\scheduler\MonitorableScheduler;
 use webmagic\scheduler\Scheduler;
 
@@ -50,7 +51,7 @@ class RedisScheduler implements Scheduler, MonitorableScheduler
     public function getExtra($url)
     {
         $extra = $this->getClient()->hGet($this->extraKey, $url);
-        return unserialize($extra);
+        return $extra ? unserialize($extra) : [];
     }
 
     public function push($url, $extra = [])
@@ -74,7 +75,7 @@ class RedisScheduler implements Scheduler, MonitorableScheduler
 
     public function getLeftUrlsCount()
     {
-        return $this->getClient()->lSize($this->queueKey);
+        return $this->getClient()->lLen($this->queueKey);
     }
 
     public function getTotalUrlsCount()
