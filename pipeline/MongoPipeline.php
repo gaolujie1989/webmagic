@@ -7,6 +7,7 @@ namespace lib\webmagic\pipeline;
 
 
 use GuzzleHttp\Psr7\Response;
+use MongoDB\BSON\UTCDateTime;
 use MongoDB\Client;
 use MongoDB\Collection;
 use webmagic\pipeline\Pipeline;
@@ -30,7 +31,11 @@ class MongoPipeline implements Pipeline
 
     public $databaseName = 'spider';
     public $collectionName = 'spider_data';
+
     public $index = 'url';
+
+    public $createdAt = 'created_at';
+    public $updatedAt = 'updated_at';
 
     /**
      * @var \Closure
@@ -54,6 +59,7 @@ class MongoPipeline implements Pipeline
      * @param string $index
      * @param string $url
      * @param array $extra
+     * @return \MongoDB\InsertOneResult|\MongoDB\UpdateResult
      * @inheritdoc
      */
     public function process($response, $index, $url, $extra)
@@ -69,12 +75,20 @@ class MongoPipeline implements Pipeline
             $condition = [$this->index => $data[$this->index]];
             $one = $this->getCollection()->findOne($condition);
             if ($one) {
-                $this->getCollection()->updateOne($condition, ['$set' => $data]);
-                return;
+                if ($this->updatedAt) {
+                    $data[$this->updatedAt] = new UTCDateTime(time() * 1000);
+                }
+                return $this->getCollection()->updateOne($condition, ['$set' => $data]);
             }
         }
 
-        $this->getCollection()->insertOne($data);
+        if ($this->createdAt) {
+            $data[$this->createdAt] = new UTCDateTime(time() * 1000);
+        }
+        if ($this->updatedAt) {
+            $data[$this->updatedAt] = new UTCDateTime(time() * 1000);
+        }
+        return $this->getCollection()->insertOne($data);
     }
 
     /**

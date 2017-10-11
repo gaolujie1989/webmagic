@@ -33,6 +33,11 @@ class DbPipeline implements Pipeline
 
     public $table = 'spider_data';
 
+    public $index = 'url';
+
+    public $createdAt = 'created_at';
+    public $updatedAt = 'updated_at';
+
     /**
      * @var \Closure
      */
@@ -51,7 +56,7 @@ class DbPipeline implements Pipeline
      * @param string $index
      * @param string $url
      * @param array $extra
-     * @return int
+     * @return bool|\PDOStatement
      * @inheritdoc
      */
     public function process($response, $index, $url, $extra)
@@ -62,6 +67,26 @@ class DbPipeline implements Pipeline
         } else {
             $data = array_merge($extra, ['url' => $url, 'html' => $html]);
         }
+
+        if ($this->index && isset($data[$this->index])) {
+            $condition = [$this->index => $data[$this->index]];
+            $one = $this->getDb()->select($this->table, '*', $condition);
+            if ($one) {
+                if ($this->updatedAt) {
+                    $data[$this->updatedAt] = date('Y-m-d H:i:s');
+                }
+                return $this->getDb()->update($this->table, $data, $condition);
+
+            }
+        }
+
+        if ($this->createdAt) {
+            $data[$this->createdAt] = date('Y-m-d H:i:s');
+        }
+        if ($this->updatedAt) {
+            $data[$this->updatedAt] = date('Y-m-d H:i:s');
+        }
+
         return $this->getDb()->insert($this->table, $data);
     }
 
